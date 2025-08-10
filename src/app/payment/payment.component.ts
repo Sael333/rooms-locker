@@ -15,7 +15,7 @@ export class PaymentComponent {
 
   async redirectToCheckout() {
     const stripe = await this.stripePromise;
-    this.http.post<any>('http://localhost:8080/v1/create-checkout-session', {}).subscribe(async (res) => {
+    this.http.post<any>('https://book-management-dev.onrender.com/v1/create-checkout-session', {}).subscribe(async (res) => {
       await stripe?.redirectToCheckout({ sessionId: res.id });
     });
   }
