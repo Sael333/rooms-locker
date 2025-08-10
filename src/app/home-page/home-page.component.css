@@ -1,0 +1,115 @@
+.home-page {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Evita problemas en móvil con height */
+  background-color: #f7f7f7;
+  font-family: 'Arial', sans-serif;
+  padding: 1rem; /* espacio lateral en pantallas pequeñas */
+}
+
+/* Contenedor con margen adaptable */
+.container-options {
+  text-align: center;
+  background-color: white;
+  border-radius: 50px;
+  box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+  padding: clamp(1rem, 5vw, 40px);
+  max-width: 500px;
+  width: 100%;
+  margin: clamp(1rem, 4vh, 2rem) auto;
+  background-image: url('/assets/images/rooms-designs.jpg');
+  background-size: cover;        /* La imagen cubre todo el contenedor */
+  background-position: center;   /* Centra la imagen */
+  background-repeat: no-repeat;  /* Evita que se repita */
+}
+
+/* Título */
+.home-page h2 {
+  font-size: 1.5rem;
+  color: #333;
+  margin-top: 6rem;
+  font-weight: 2rem;
+  font-family: "Playfair Display", serif;
+}
+
+/* Botones */
+button {
+  font-size: clamp(1.1rem, 3vw, 1.5rem);
+  padding: clamp(10px, 2vw, 15px) clamp(20px, 5vw, 30px);
+  margin: 15px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: clamp(180px, 60%, 250px);
+  font-family: "Playfair Display", serif;
+}
+
+/* Mensaje de servicio no disponible */
+#unavailableServiceMsg {
+  background-color: #f8d7da;
+  color: #721c24;
+  font-size: clamp(1rem, 2.5vw, 1.3rem);
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+/* Botón "Guardar Equipaje" */
+button:first-of-type {
+  background-color: #27912b;
+  color: white;
+}
+button:first-of-type:hover {
+  background-color: #39b53f;
+}
+
+/* Botón "Recoger Equipaje" */
+button:last-of-type {
+  background-color: #1935c2;
+  color: white;
+}
+button:last-of-type:hover {
+  background-color: #1e88e5;
+}
+
+/* Efecto clic */
+button:active {
+  transform: scale(0.98);
+}
+
+/* Breakpoints */
+@media (max-width: 768px) {
+  .home-page {
+    padding: 2rem 1rem;
+    align-items: flex-start; /* para que haya margen arriba en móvil */
+  }
+
+  .home-page h2 {
+    font-size: 1.5rem;
+    color: #333;
+    margin-top: 6rem;
+    font-weight: 2rem;
+    font-family: "Playfair Display", serif;
+  }
+
+  .container-options {
+    padding: 1.5rem;
+    margin-top: 1rem; /* extra margen en móviles medianos */
+    background-size: cover;        /* La imagen cubre todo el contenedor */
+    background-position: center;   /* Centra la imagen */
+    background-repeat: no-repeat;  /* Evita que se repita */
+  }
+}
+
+@media (max-width: 480px) {
+  .home-page h2 {
+    margin-bottom: 20px;
+  }
+  button {
+    width: 100%; /* botones ocupan todo el ancho */
+    margin: 10px 0;
+  }
+}

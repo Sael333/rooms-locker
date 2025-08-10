@@ -1,0 +1,71 @@
+<!-- Encabezado del formulario -->
+<h2 class="header-title">ANDALUSIAN ROOMS LOCKER</h2>
+<div *ngIf="bookingMsg" id="bookingMsg">
+    <p>{{ bookingMsg }}</p>
+  </div>
+<form #form="ngForm" (ngSubmit)="onSubmit(form)">
+  <!-- Campo de nombre -->
+  <div>
+    <label for="name">Nombre</label>
+    <input type="text" id="name" name="name" ngModel required placeholder="Ingresa tu nombre">
+    <div *ngIf="form.controls['name']?.invalid && form.controls['name']?.touched" class="error">
+      El nombre es obligatorio.
+    </div>
+  </div>
+
+  <!-- Campo de teléfono -->
+  <div>
+    <label for="phone">Teléfono</label>
+    <input type="tel" id="phone" name="phone" pattern="^[0-9]{9}$" ngModel required #phone="ngModel" placeholder="Ingresa tu teléfono">
+    <div *ngIf="phone.invalid && phone.touched" class="error">
+      <div *ngIf="phone.errors?.['required']">
+        El teléfono es obligatorio.
+      </div>
+      <div *ngIf="phone.errors?.['pattern']">
+        El teléfono debe tener exactamente 9 dígitos numéricos.
+      </div>
+    </div>
+  </div>
+
+  <!-- Campo de email -->
+  <div>
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email" ngModel required email #email="ngModel" placeholder="Ingresa tu email">
+    <div *ngIf="email.invalid && email.touched" class="error">
+      <div *ngIf="email.errors?.['required']">
+        El email es obligatorio.
+      </div>
+      <div *ngIf="email.errors?.['email']">
+        El email debe ser válido.
+      </div>
+    </div>
+  </div>
+
+  <!-- Campo de fecha límite -->
+  <div>
+    <label for="expiration">Fecha recogida equipaje</label>
+    <input type="date" id="expiration" name="expiration" ngModel required #expiration="ngModel"  [min]="minDate" (change)="calculatePrice()">
+    <div *ngIf="expiration.invalid && expiration.touched" class="error">
+      La fecha es obligatoria.
+    </div>
+  </div>
+  
+  <!-- Selector de método de pago -->
+  <div>
+    <label for="paymentMethod">Método de pago</label>
+    <select id="paymentMethod" name="paymentMethod" ngModel required>
+      <option value="">Seleccione un método de pago</option>
+      <option value="creditCard">Pago con tarjeta de crédito</option>
+      <option value="paypal">PayPal</option>
+      <option value="bankTransfer">Transferencia bancaria</option>
+    </select>
+  </div>
+<!-- Muestra el precio calculado -->
+<div *ngIf="totalPrice !== null">
+    <label for="price">Precio</label>
+    <p id="price">€ {{ totalPrice }}</p>
+  </div>
+  <!-- Botón de Enviar -->
+  <button class="enviar" type="submit" [disabled]="form.invalid">Reservar</button>
+  
+</form>

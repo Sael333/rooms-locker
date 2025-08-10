@@ -1,0 +1,10 @@
+<div class="home-page">
+    <div class="container-options">
+        <h2>ANDALUSIAN ROOMS LOCKER</h2>
+        <button (click)="route('generateBooking')">Guardar Equipaje</button>
+        <button (click)="route('pickupLuggage')">Recoger Equipaje</button>
+        <div *ngIf="unavailableServiceMsg" id="unavailableServiceMsg">
+            <p>{{ unavailableServiceMsg }}</p>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,39 @@
+<!-- Formulario para generar código de reserva -->
+<h2 class="header-title">GENERAR CÓDIGO DE RESERVA</h2>
+<form #codeForm="ngForm" (ngSubmit)="onGenerateCode(codeForm)">
+  <!-- Campo de ID de reserva -->
+  <div>
+    <label for="reservationId">ID de reserva</label>
+    <input 
+      type="text" 
+      id="reservationId" 
+      name="reservationId" 
+      ngModel 
+      required 
+      pattern="^[a-zA-Z0-9_-]{5,20}$" 
+      #reservationId="ngModel" 
+      placeholder="Ingresa tu ID de reserva">
+    <div *ngIf="reservationId.invalid && reservationId.touched" class="error">
+      <div *ngIf="reservationId.errors?.['required']">
+        El ID de reserva es obligatorio.
+      </div>
+      <div *ngIf="reservationId.errors?.['pattern']">
+        El ID debe tener entre 5 y 20 caracteres, solo letras, números, guiones o guion bajo.
+      </div>
+    </div>
+  </div>
+
+  <button class="enviar" type="submit" [disabled]="codeForm.invalid || loading">
+    <ng-container *ngIf="!loading; else loadingTpl">
+        Generar código
+    </ng-container>
+    <ng-template #loadingTpl>
+        <span class="spinner"></span> Cargando...
+    </ng-template>
+  </button>
+
+  <!-- Mensaje resultado -->
+  <div *ngIf="codeMsg" id="codeMsg">
+    <p>{{ codeMsg }}</p>
+  </div>
+</form>

@@ -1,0 +1,7 @@
+<div class="home-page">
+  <div class="container-options">
+    <h2 *ngIf="loading">Procesando reserva, por favor espera...</h2>
+    <h2 *ngIf="!loading && !errorMsg">Pago confirmado. Reserva realizada con éxito.</h2>
+    <h2 *ngIf="errorMsg" id="unavailableServiceMsg">{{ errorMsg }}</h2>
+  </div>
+</div>
