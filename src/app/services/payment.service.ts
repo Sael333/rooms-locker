@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class PaymentService {
-  private baseUrl = 'https://book-management-dev.onrender.com:8080/v1';
+  private baseUrl = 'https://book-management-dev.onrender.com/v1';
 
   constructor(private http: HttpClient) {}
 

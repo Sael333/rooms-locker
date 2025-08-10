@@ -7,7 +7,7 @@ import { Observable, tap } from 'rxjs';
 })
 export class AuthService {
   
-  private apiUrl = 'https://book-management-dev.onrender.com:8080/v1';  // URL de tu backend
+  private apiUrl = 'https://book-management-dev.onrender.com/v1';  // URL de tu backend
 
   constructor(private http: HttpClient) {}
 

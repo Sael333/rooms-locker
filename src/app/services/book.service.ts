@@ -8,7 +8,7 @@ import { AuthService } from './authService.service';
 })
 export class BookService {
 
-  private apiUrl = 'https://book-management-dev.onrender.com:8080/v1';  // Cambia esta URL por la del backend.
+  private apiUrl = 'https://book-management-dev.onrender.com/v1';  // Cambia esta URL por la del backend.
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 
