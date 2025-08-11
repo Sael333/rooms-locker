@@ -66,6 +66,12 @@
     <p id="price">€ {{ totalPrice }}</p>
   </div>
   <!-- Botón de Enviar -->
-  <button class="enviar" type="submit" [disabled]="form.invalid">Reservar</button>
+  <button class="enviar" type="submit" 
+        [disabled]="form.invalid || isLoading">
+        <ng-container *ngIf="!isLoading">Reservar</ng-container>
+        <ng-container *ngIf="isLoading">
+          <span class="spinner"></span> Procesando...
+        </ng-container>
+  </button>
   
 </form>
