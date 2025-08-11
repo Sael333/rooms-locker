@@ -56,7 +56,7 @@ export class GenerateBookingComponent {
 async redirectToCheckout(bookData: any) {
   try {
     const session = await this.paymentService.createCheckoutSession(bookData.totalPrice).toPromise();
-    const stripe = await loadStripe('pk_test_51ReswyIsUbiUMsbMgVn2lygzeh2Emgct9ReqonVfqNNJFPm8o5TWVpE9lDhhEEcE5GboKHEx9N49MhlkXECaGGoy00VxmikJNY');
+    const stripe = await loadStripe(environment.stripePublicKey);
 
     if (stripe && session?.id) {
       sessionStorage.setItem('bookData', JSON.stringify(bookData));
