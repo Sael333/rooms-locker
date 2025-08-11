@@ -67,25 +67,27 @@ export class GenerateBookingComponent {
     }
   }
  
-  // Función para calcular el precio
-  calculatePrice() {
-    const expirationDate = new Date((<HTMLInputElement>document.getElementById('expiration')).value);
-    const currentDate = new Date();
-    
-    // Calcula la diferencia en milisegundos
-    const timeDifference = expirationDate.getTime() - currentDate.getTime();
-    
-    // Calcula la cantidad de días de diferencia
-    const dayDifference = timeDifference / (1000 * 3600 * 24);
+ calculatePrice() {
+  const expirationDate = new Date((<HTMLInputElement>document.getElementById('expiration')).value);
+  const currentDate = new Date();
 
-    if (dayDifference > 0) {
-      // Si la fecha es válida y mayor que la fecha actual, calculamos el precio
-      this.totalPrice = (this.PRICE_PER_DAY * 2) + (Math.round(dayDifference) * this.PRICE_PER_DAY); // 5 euros por día
-    } else {
-      // Si la fecha es menor o igual a la fecha actual, no mostramos el precio
-      this.totalPrice = this.PRICE_PER_DAY;
-    }
+  // Diferencia en milisegundos
+  const timeDifference = expirationDate.getTime() - currentDate.getTime();
+
+  // Diferencia en días (puede ser fracción)
+  let dayDifference = timeDifference / (1000 * 3600 * 24);
+
+  if (dayDifference >= 0) {
+    // Cobrar siempre días completos
+    const daysToCharge = Math.max(1, Math.ceil(dayDifference));
+
+    // Precio final
+    this.totalPrice = daysToCharge * this.PRICE_PER_DAY;
+  } else {
+    // Si la fecha es anterior a la actual, precio mínimo de 1 día
+    this.totalPrice = this.PRICE_PER_DAY;
   }
+}
 
   calculateEndDate(expirationDate: string): string {
     const expirationMoment = moment(expirationDate);
