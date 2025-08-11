@@ -2,13 +2,14 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { AuthService } from './authService.service';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BookService {
 
-  private apiUrl = 'https://book-management-dev.onrender.com/v1';  // Cambia esta URL por la del backend.
+  private apiUrl = environment.apiUrl;  // Cambia esta URL por la del backend.
 
   constructor(private http: HttpClient, private authService: AuthService) {}
 

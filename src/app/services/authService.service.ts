@@ -1,13 +1,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   
-  private apiUrl = 'https://book-management-dev.onrender.com/v1';  // URL de tu backend
+  private apiUrl = environment.apiUrl;  // URL de tu backend
 
   constructor(private http: HttpClient) {}
 
