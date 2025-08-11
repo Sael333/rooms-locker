@@ -6,6 +6,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import { PaymentService } from '../services/payment.service';
 import { Route, Router } from '@angular/router';
 import { BookingDataService } from '../services/booking-data.service';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-generate-booking',
@@ -16,7 +17,7 @@ export class GenerateBookingComponent {
   minDate: string = '';
   [x: string]: any;
   totalPrice: number | null = null; // Inicializamos el precio como null
-  PRICE_PER_DAY = 8;
+  PRICE_PER_DAY = environment.price;
   booking: any;  // Para almacenar la respuesta del backend
   bookingMsg: string | undefined;  // Para mostrar el mensaje en el HTML
   paymentData: { paymentConfirm: boolean; userId: string; } | undefined;
