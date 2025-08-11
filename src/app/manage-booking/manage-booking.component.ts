@@ -26,6 +26,7 @@ onGenerateCode(form: any) {
 
   const reservationId = form.value.reservationId;
   this.codeMsg = null;
+  this.errorMsg = null;
   this.loading = true; // activar estado de carga
 
   this.bookService.pickupLuggagge(reservationId).subscribe({
@@ -35,7 +36,7 @@ onGenerateCode(form: any) {
         localStorage.removeItem('bookData');
         this.codeMsg = `Ha recibido el código de recogida de maletas en su email.`;
       } else if (response.status === 204) {
-        this.codeMsg = `Su reserva ha caducado, debe realizar una nueva reserva.`;
+        this.errorMsg = `Su reserva ha caducado, debe realizar una nueva reserva.`;
       }
       this.loading = false; // desactivar carga
     },

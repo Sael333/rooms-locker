@@ -33,7 +33,14 @@
   </button>
 
   <!-- Mensaje resultado -->
-  <div *ngIf="codeMsg" id="codeMsg">
-    <p>{{ codeMsg }}</p>
-  </div>
+  <!-- Mensaje resultado -->
+    <div *ngIf="codeMsg; else showErrorMsg" id="codeMsg">
+      <p>{{ codeMsg }}</p>
+    </div>
+
+    <ng-template #showErrorMsg>
+      <div *ngIf="errorMsg" id="errorMsg">
+        <p>{{ errorMsg }}</p>
+      </div>
+    </ng-template>
 </form>
