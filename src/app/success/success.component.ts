@@ -69,7 +69,7 @@ export class SuccessComponent implements OnInit {
           this.booking = response.body;
           console.log('Reserva enviada con éxito', response);
           localStorage.removeItem('bookData');
-          this.bookingMsg = `Reserva realizada con éxito ${this.booking.name}. Le hemos enviado los detalles de su reserva a su correo.`;
+          this.bookingMsg = `Reserva completada. Revise su correo.`;
 
           this.bookingDataService.setBookingData(this.booking, this.bookingMsg);
           this.router.navigate(['/generateBooking']);

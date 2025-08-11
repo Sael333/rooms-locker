@@ -95,14 +95,15 @@ form {
     text-align: center;
     margin-top: 1rem;
   }
-  #bookingMsg {
-    background-color: #41c460; /* Verde de éxito */
+    #bookingMsg {
+    background-color: #505ed3; /* Verde de éxito */
     color: white;
     font-size: 1.2rem;
     padding: 1rem;
     border-radius: 8px;
     text-align: center;
-    margin-top: 1rem;
+    margin: auto;
+    max-width: fit-content;
   }
   /* Media Queries para Responsividad */
   
