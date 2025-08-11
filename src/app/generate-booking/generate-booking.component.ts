@@ -103,13 +103,15 @@ async redirectToCheckout(bookData: any) {
   }
 
   calculateEndDate(expirationDate: string): string {
-    const expirationMoment = moment(expirationDate);
-    
-    const currentHour = moment().hours();
-    const currentMinute = moment().minutes();
+    const expirationMoment = moment(expirationDate, 'YYYY-MM-DD');
+    const today = moment().startOf('day'); // medianoche de hoy
 
-    expirationMoment.set('hour', currentHour);
-    expirationMoment.set('minute', currentMinute);
-    return expirationMoment.format('YYYY-MM-DDTHH:mm:ss');
+    if (expirationMoment.isSame(today, 'day')) {
+      // Si es el día actual, poner endDate a medianoche del día siguiente
+      return expirationMoment.add(1, 'day').startOf('day').format('YYYY-MM-DDTHH:mm:ss');
+    } else {
+      // Si es otro día, poner endDate a medianoche de ese día
+      return expirationMoment.startOf('day').format('YYYY-MM-DDTHH:mm:ss');
+    }
   }
 }
