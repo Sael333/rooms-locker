@@ -68,25 +68,35 @@ export class GenerateBookingComponent {
   }
  
  calculatePrice() {
-  const expirationDate = new Date((<HTMLInputElement>document.getElementById('expiration')).value);
-  const currentDate = new Date();
-
-  // Diferencia en milisegundos
-  const timeDifference = expirationDate.getTime() - currentDate.getTime();
-
-  // Diferencia en días (puede ser fracción)
-  let dayDifference = timeDifference / (1000 * 3600 * 24);
-
-  if (dayDifference >= 0) {
-    // Cobrar siempre días completos
-    const daysToCharge = Math.max(1, Math.ceil(dayDifference));
-
-    // Precio final
-    this.totalPrice = daysToCharge * this.PRICE_PER_DAY;
-  } else {
-    // Si la fecha es anterior a la actual, precio mínimo de 1 día
+  const input = (<HTMLInputElement>document.getElementById('expiration')).value;
+  if (!input) {
     this.totalPrice = this.PRICE_PER_DAY;
+    return;
   }
+
+  // Parsear YYYY-MM-DD como fecha local (evita el problema UTC)
+  const [yearStr, monthStr, dayStr] = input.split('-');
+  const year = Number(yearStr);
+  const month = Number(monthStr);
+  const day = Number(dayStr);
+
+  if (Number.isNaN(year) || Number.isNaN(month) || Number.isNaN(day)) {
+    this.totalPrice = this.PRICE_PER_DAY;
+    return;
+  }
+
+  const expirationDateLocal = new Date(year, month - 1, day); // medianoche local del día seleccionado
+  const now = new Date();
+  const todayLocal = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // medianoche local de hoy
+
+  const msPerDay = 1000 * 60 * 60 * 24;
+  const diffMs = expirationDateLocal.getTime() - todayLocal.getTime();
+  const diffDays = Math.floor(diffMs / msPerDay); // diferencia en días calendario (puede ser 0,1,2,...)
+
+  // Si la fecha es anterior, cobrar 1 día; en otro caso cobrar (diffDays + 1) para ser inclusivo
+  const daysToCharge = diffDays < 0 ? 1 : diffDays + 1;
+
+  this.totalPrice = daysToCharge * this.PRICE_PER_DAY;
 }
 
   calculateEndDate(expirationDate: string): string {
