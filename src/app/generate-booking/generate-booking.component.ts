@@ -4,7 +4,7 @@ import { NgForm } from '@angular/forms';
 import * as moment from 'moment';
 import { loadStripe } from '@stripe/stripe-js';
 import { PaymentService } from '../services/payment.service';
-import { Route, Router } from '@angular/router';
+import { Router } from '@angular/router';
 import { BookingDataService } from '../services/booking-data.service';
 import { environment } from 'src/environments/environment';
 
@@ -15,62 +15,79 @@ import { environment } from 'src/environments/environment';
 })
 export class GenerateBookingComponent {
   minDate: string = '';
-  [x: string]: any;
-  totalPrice: number | null = null; // Inicializamos el precio como null
+  totalPrice: number | null = null;
   PRICE_PER_DAY = environment.price;
-  booking: any;  // Para almacenar la respuesta del backend
-  bookingMsg: string | undefined;  // Para mostrar el mensaje en el HTML
+
+  booking: any;  
+  bookingMsg: string | undefined;
   paymentData: { paymentConfirm: boolean; userId: string; } | undefined;
   isLoading = false;
 
-  constructor(private bookService: BookService, private bookingDataService: BookingDataService, private paymentService: PaymentService, private router: Router) {}
+  // 🔹 Nuevo: lista de tamaños y tamaño seleccionado
+  availableSizes: string[] = [];
+  selectedSize: string | null = null;
+
+  constructor(
+    private bookService: BookService,
+    private bookingDataService: BookingDataService,
+    private paymentService: PaymentService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     const today = new Date();
-    this.minDate = today.toISOString().split('T')[0];  // Formato 'YYYY-MM-DD'
-  
-      this.booking = this.bookingDataService.getBookingData();
-      this.bookingMsg = this.bookingDataService.getBookingMsg();
+    this.minDate = today.toISOString().split('T')[0];  
 
-      // Opcional: limpiar para evitar mostrar datos antiguos
-      this.bookingDataService.clear();
-    }
-  
-  // Función que se ejecuta cuando el formulario es enviado
+    this.booking = this.bookingDataService.getBookingData();
+    this.bookingMsg = this.bookingDataService.getBookingMsg();
+
+    // 🔹 Recuperar tamaños disponibles del servicio
+    this.availableSizes = this.bookingDataService.getAvailableSizes();
+    // Limpieza de datos antiguos
+    this.bookingDataService.clear();
+  }
+
+  // Seleccionar tamaño
+  selectSize(size: string) {
+    this.selectedSize = size;
+  }
+
+  // Envío del formulario
   onSubmit(form: NgForm) {
-  if (form.valid) {
-    this.isLoading = true; // Activa el estado de carga
+    if (form.valid && this.selectedSize) {
+      this.isLoading = true;
 
-    const bookData = {
-      name: form.value.name,
-      phone: form.value.phone,
-      email: form.value.email,
-      endDate: this.calculateEndDate(form.value.expiration),
-      paymentConfirm: false,
-      totalPrice: this.totalPrice,
-    };
-    this.redirectToCheckout(bookData);
-  }
-}
+      const bookData = {
+        name: form.value.name,
+        phone: form.value.phone,
+        email: form.value.email,
+        endDate: this.calculateEndDate(form.value.expiration),
+        paymentConfirm: false,
+        totalPrice: this.totalPrice,
+        size: this.selectedSize  // 🔹 añadimos el tamaño
+      };
 
-async redirectToCheckout(bookData: any) {
-  try {
-    const session = await this.paymentService.createCheckoutSession(bookData.totalPrice).toPromise();
-    const stripe = await loadStripe(environment.stripePublicKey);
-
-    if (stripe && session?.id) {
-      sessionStorage.setItem('bookData', JSON.stringify(bookData));
-      const { error } = await stripe.redirectToCheckout({ sessionId: session.id });
-      if (error) console.error('Stripe redirection error:', error.message);
+      this.redirectToCheckout(bookData);
     }
-  } catch (err) {
-    console.error('Error creando la sesión:', err);
-  } finally {
-    this.isLoading = false; // Desactiva el estado al final
   }
-}
 
- 
+  async redirectToCheckout(bookData: any) {
+    try {
+      const session = await this.paymentService.createCheckoutSession(bookData.totalPrice).toPromise();
+      const stripe = await loadStripe(environment.stripePublicKey);
+
+      if (stripe && session?.id) {
+        sessionStorage.setItem('bookData', JSON.stringify(bookData));
+        const { error } = await stripe.redirectToCheckout({ sessionId: session.id });
+        if (error) console.error('Stripe redirection error:', error.message);
+      }
+    } catch (err) {
+      console.error('Error creando la sesión:', err);
+    } finally {
+      this.isLoading = false;
+    }
+  }
+
   calculatePrice() {
     const input = (<HTMLInputElement>document.getElementById('expiration')).value;
     if (!input) {
@@ -78,7 +95,6 @@ async redirectToCheckout(bookData: any) {
       return;
     }
 
-    // Parsear YYYY-MM-DD como fecha local (evita el problema UTC)
     const [yearStr, monthStr, dayStr] = input.split('-');
     const year = Number(yearStr);
     const month = Number(monthStr);
@@ -89,29 +105,33 @@ async redirectToCheckout(bookData: any) {
       return;
     }
 
-    const expirationDateLocal = new Date(year, month - 1, day); // medianoche local del día seleccionado
+    const expirationDateLocal = new Date(year, month - 1, day);
     const now = new Date();
-    const todayLocal = new Date(now.getFullYear(), now.getMonth(), now.getDate()); // medianoche local de hoy
+    const todayLocal = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
     const msPerDay = 1000 * 60 * 60 * 24;
     const diffMs = expirationDateLocal.getTime() - todayLocal.getTime();
-    const diffDays = Math.floor(diffMs / msPerDay); // diferencia en días calendario (puede ser 0,1,2,...)
+    const diffDays = Math.floor(diffMs / msPerDay);
 
-    // Si la fecha es anterior, cobrar 1 día; en otro caso cobrar (diffDays + 1) para ser inclusivo
     const daysToCharge = diffDays < 0 ? 1 : diffDays + 1;
+    // 🔹 Precio base
+    let dailyPrice = this.PRICE_PER_DAY;
 
-    this.totalPrice = daysToCharge * this.PRICE_PER_DAY;
+    // 🔹 Recargo de 2€/día si la taquilla es XL
+    if (this.selectedSize === 'XL') {
+      dailyPrice += environment.plusPrice;
+    }
+
+    this.totalPrice = daysToCharge * dailyPrice;
   }
 
   calculateEndDate(expirationDate: string): string {
     const expirationMoment = moment(expirationDate, 'YYYY-MM-DD');
-    const today = moment().startOf('day'); // medianoche de hoy
+    const today = moment().startOf('day');
 
     if (expirationMoment.isSame(today, 'day')) {
-      // Si es el día actual, poner endDate a medianoche del día siguiente
       return expirationMoment.add(1, 'day').startOf('day').format('YYYY-MM-DDTHH:mm:ss');
     } else {
-      // Si es otro día, poner endDate a medianoche de ese día
       return expirationMoment.startOf('day').format('YYYY-MM-DDTHH:mm:ss');
     }
   }

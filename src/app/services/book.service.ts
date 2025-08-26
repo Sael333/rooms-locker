@@ -26,9 +26,16 @@ export class BookService {
     console.log(headers);
     return this.http.put(this.apiUrl.concat("/pickupLuggage"), bookingId, { headers, observe: 'response' });
   }
+  // 🔹 Comprobar disponibilidad + obtener tamaños
+  checkBoxOfficeAvailables(): Observable<HttpResponse<{ available: boolean, sizes: string[] }>> {
+    return this.http.get<{ available: boolean, sizes: string[] }>(
+      this.apiUrl.concat("/checkBoxOfficeAvailable"),
+      { observe: 'response' }
+    );
+  }
 
-  // Método para comprobar si hay taquillas disponibles
-  checkBoxOfficeAvailables(): Observable<HttpResponse<any>> {
-    return this.http.get(this.apiUrl.concat("/checkBoxOfficeAvailable"), { observe: 'response' });
+  // 🔹 Obtener tamaños disponibles desde backend
+  getAvailableSizes(): Observable<HttpResponse<string[]>> {
+    return this.http.get<string[]>(this.apiUrl.concat("/lockers/sizes"), { observe: 'response' });
   }
 }

@@ -7,6 +7,7 @@ import { Injectable } from '@angular/core';
 export class BookingDataService {
   private bookingData: any = null;
   private bookingMsg: string | undefined;
+  private availableSizes: string[] = [];
 
   setBookingData(data: any, msg?: string) {
     this.bookingData = data;
@@ -24,5 +25,14 @@ export class BookingDataService {
   clear() {
     this.bookingData = null;
     this.bookingMsg = undefined;
+  }
+  
+   // 🔹 NUEVOS métodos para tamaños
+  setAvailableSizes(sizes: string[]) {
+    this.availableSizes = sizes;
+  }
+
+  getAvailableSizes() {
+    return this.availableSizes;
   }
 }

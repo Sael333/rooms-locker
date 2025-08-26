@@ -1,8 +1,10 @@
 <!-- Encabezado del formulario -->
 <h2 class="header-title">ANDALUSIAN ROOMS LOCKER</h2>
+
 <div *ngIf="bookingMsg" id="bookingMsg">
-    <p>{{ bookingMsg }}</p>
-  </div>
+  <p>{{ bookingMsg }}</p>
+</div>
+
 <form #form="ngForm" (ngSubmit)="onSubmit(form)">
   <!-- Campo de nombre -->
   <div>
@@ -40,38 +42,70 @@
       </div>
     </div>
   </div>
+  <div>
+    <label>Tamaño de taquilla</label>
+    <div class="locker-sizes">
+    <!-- Opción L -->
+    <button type="button"
+            [disabled]="!availableSizes.includes('L')"
+            [class.selected]="selectedSize === 'L'"
+            (click)="selectedSize = 'L'">
+      <span class="icon">🧳</span>
+      <span class="letter">L</span>
+    </button>
 
+    <!-- Opción XL -->
+    <button type="button"
+            [disabled]="!availableSizes.includes('XL')"
+            [class.selected]="selectedSize === 'XL'"
+            (click)="selectedSize = 'XL'"
+            class="large-icon">
+      <span class="icon">🧳</span>
+      <span class="letter">XL</span>
+    </button>
+  </div>
+  <div *ngIf="!selectedSize && form.submitted" class="error">
+      Debes seleccionar un tamaño de taquilla.
+    </div>
+  </div>
   <!-- Campo de fecha límite -->
   <div>
-    <label for="expiration">Fecha recogida equipaje</label>
-    <input type="date" id="expiration" name="expiration" ngModel required #expiration="ngModel"  [min]="minDate" (change)="calculatePrice()">
+  <label for="expiration">Fecha recogida equipaje</label>
+    <input type="date" 
+          id="expiration" 
+          name="expiration" 
+          ngModel 
+          required 
+          #expiration="ngModel" 
+          [min]="minDate" 
+          (change)="calculatePrice()"
+          [disabled]="!selectedSize"> <!-- 🔹 Bloqueado hasta elegir taquilla -->
     <div *ngIf="expiration.invalid && expiration.touched" class="error">
       La fecha es obligatoria.
     </div>
   </div>
-  
+
   <!-- Selector de método de pago -->
   <div>
     <label for="paymentMethod">Método de pago</label>
     <select id="paymentMethod" name="paymentMethod" ngModel required>
       <option value="">Seleccione un método de pago</option>
       <option value="creditCard">Pago con tarjeta de crédito</option>
-      <option value="paypal">PayPal</option>
-      <option value="bankTransfer">Transferencia bancaria</option>
     </select>
   </div>
-<!-- Muestra el precio calculado -->
-<div *ngIf="totalPrice !== null">
+
+  <!-- Muestra el precio calculado -->
+  <div *ngIf="totalPrice !== null">
     <label for="price">Precio</label>
     <p id="price">€ {{ totalPrice }}</p>
   </div>
+
   <!-- Botón de Enviar -->
   <button class="enviar" type="submit" 
-        [disabled]="form.invalid || isLoading">
+        [disabled]="form.invalid || isLoading || !selectedSize">
         <ng-container *ngIf="!isLoading">Reservar</ng-container>
         <ng-container *ngIf="isLoading">
           <span class="spinner"></span> Procesando...
         </ng-container>
   </button>
-  
 </form>

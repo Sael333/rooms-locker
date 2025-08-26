@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { BookService } from '../services/book.service';
+import { BookingDataService } from '../services/booking-data.service';
 
 @Component({
   selector: 'app-home-page',
@@ -9,26 +10,31 @@ import { BookService } from '../services/book.service';
 })
 export class HomePageComponent {
 
-  constructor(private router: Router, private bookService: BookService) {}
+  constructor(private router: Router, private bookService: BookService, private bookingDataService: BookingDataService) {}
+ 
   boxOfficesAvailables:boolean = false;
   unavailableServiceMsg: String | undefined;
+
   // Método para redirigir a las rutas correspondientes
   route(ruta: string): void {
-    if (ruta == "generateBooking") {
-      this.bookService.checkBoxOfficeAvailables().subscribe(response => {
-        if (response.status == 200 && response.body == true) {
-          this.router.navigate([ruta]);
-        } else {
-          this.unavailableServiceMsg = "Lo sentimos, todas las taquillas estan ocupadas";
+    if (ruta === "generateBooking") {
+      this.bookService.checkBoxOfficeAvailables().subscribe({
+        next: (response) => {
+          if (response.status === 200 && response.body?.available) {
+            // ✅ Guardamos en el servicio compartido
+            this.bookingDataService.setAvailableSizes(response.body.sizes);
+            this.router.navigate([ruta]);
+          } else {
+            this.unavailableServiceMsg = "Lo sentimos, todas las taquillas están ocupadas";
+          }
+        },
+        error: (err) => {
+          console.error('Error al comprobar taquillas disponibles', err);
+          this.unavailableServiceMsg = "Error al comprobar disponibilidad";
         }
-      },
-      error => {
-        console.error('Error al comprobar taquillas disponibles', error);
-        // Aquí puedes manejar el error (ej., mostrar un mensaje de error)
       });
     } else {
       this.router.navigate([ruta]);
     }
-       
-    }
+  }
 }
