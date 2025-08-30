@@ -45,15 +45,6 @@
   <div>
     <label>Tamaño de taquilla</label>
     <div class="locker-sizes">
-    <!-- Opción L -->
-    <button type="button"
-            [disabled]="!availableSizes.includes('L')"
-            [class.selected]="selectedSize === 'L'"
-            (click)="selectedSize = 'L'">
-      <span class="icon">🧳</span>
-      <span class="letter">L</span>
-    </button>
-
     <!-- Opción XL -->
     <button type="button"
             [disabled]="!availableSizes.includes('XL')"
@@ -62,6 +53,15 @@
             class="large-icon">
       <span class="icon">🧳</span>
       <span class="letter">XL</span>
+    </button>
+    
+    <!-- Opción L -->
+    <button type="button"
+            [disabled]="!availableSizes.includes('L')"
+            [class.selected]="selectedSize === 'L'"
+            (click)="selectedSize = 'L'">
+      <span class="icon">🧳</span>
+      <span class="letter">L</span>
     </button>
   </div>
   <div *ngIf="!selectedSize && form.submitted" class="error">
