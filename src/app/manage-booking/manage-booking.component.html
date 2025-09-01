@@ -34,13 +34,17 @@
 
   <!-- Mensaje resultado -->
   <!-- Mensaje resultado -->
-    <div *ngIf="codeMsg; else showErrorMsg" id="codeMsg">
-      <p>{{ codeMsg }}</p>
-    </div>
+    <!-- Mensaje de éxito -->
+  <div *ngIf="codeMsg; else showErrorMsg" id="codeMsg" class="success-msg" @fadeIn>
+    <span class="tick">✔</span>
+    <p>{{ codeMsg }}</p>
+  </div>
 
-    <ng-template #showErrorMsg>
-      <div *ngIf="errorMsg" id="errorMsg">
-        <p>{{ errorMsg }}</p>
-      </div>
-    </ng-template>
+  <!-- Mensaje de error -->
+  <ng-template #showErrorMsg>
+    <div *ngIf="errorMsg" id="errorMsg" class="error-msg" @fadeIn>
+      <span class="warning">⚠</span>
+      <p>{{ errorMsg }}</p>
+    </div>
+  </ng-template>
 </form>

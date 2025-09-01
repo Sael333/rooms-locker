@@ -6,15 +6,27 @@ import { AuthService } from '../services/authService.service';
 import { PaymentService } from '../services/payment.service';
 import { BookingDataService } from '../services/booking-data.service';
 import { switchMap } from 'rxjs';
+import { animate, style, transition, trigger } from '@angular/animations';
 
 @Component({
   selector: 'app-success',
   templateUrl: './success.component.html',
-  styleUrls: ['./success.component.css']
+  styleUrls: ['./success.component.css'],
+  animations: [
+      trigger('fadeIn', [
+        transition(':enter', [
+          style({ opacity: 0, transform: 'translateY(-10px)' }),
+          animate('5000ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+        ]),
+        transition(':leave', [
+          animate('2000ms ease-in', style({ opacity: 0, transform: 'translateY(-10px)' }))
+        ])
+      ])
+    ]
 })
 export class SuccessComponent implements OnInit {
   loading = true;
-  errorMsg: string | null = null;
+  errorMsg: string | undefined;
   booking: any;
   bookingMsg: string | undefined;
 
@@ -105,11 +117,20 @@ export class SuccessComponent implements OnInit {
         this.errorMsg = `Error inesperado (${error.status}). Por favor, contacte soporte.`;
         break;
     }
+    // ⏳ Redirigir a home después de 5 segundos
+    let timeoutId: number = window.setTimeout(() => {
+      this.router.navigate(['/']);
+    }, 5000);
   }
 
   private handleError(message: string) {
     this.loading = false;
     this.errorMsg = message;
+
+    // ⏳ Redirigir a home después de 5 segundos
+    let timeoutId: number = window.setTimeout(() => {
+      this.router.navigate(['/']);
+    }, 5000);
   }
 
   serializeBookingResponse(booking: any): any {

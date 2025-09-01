@@ -35,4 +35,8 @@ export class BookingDataService {
   getAvailableSizes() {
     return this.availableSizes;
   }
+
+  setBookingMsg(msg?: string) {
+    this.bookingMsg = msg;
+  }
 }

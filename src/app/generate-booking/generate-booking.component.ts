@@ -7,23 +7,36 @@ import { PaymentService } from '../services/payment.service';
 import { Router } from '@angular/router';
 import { BookingDataService } from '../services/booking-data.service';
 import { environment } from 'src/environments/environment';
+import { animate, style, transition, trigger } from '@angular/animations';
 
 @Component({
   selector: 'app-generate-booking',
   templateUrl: './generate-booking.component.html',
-  styleUrls: ['./generate-booking.component.css']
+  styleUrls: ['./generate-booking.component.css'],
+  animations: [
+    trigger('fadeIn', [
+      transition(':enter', [
+        style({ opacity: 0, transform: 'translateY(-10px)' }),
+        animate('1000ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
+      ]),
+      transition(':leave', [
+        animate('800ms ease-in', style({ opacity: 0, transform: 'translateY(-10px)' }))
+      ])
+    ])
+  ]
 })
 export class GenerateBookingComponent {
   minDate: string = '';
   totalPrice: number | null = null;
+  selectedDays: number | null = null;
+
   PRICE_PER_DAY = environment.price;
 
   booking: any;  
   bookingMsg: string | undefined;
-  paymentData: { paymentConfirm: boolean; userId: string; } | undefined;
   isLoading = false;
 
-  // 🔹 Nuevo: lista de tamaños y tamaño seleccionado
+  // Tamaños de taquilla
   availableSizes: string[] = [];
   selectedSize: string | null = null;
 
@@ -41,20 +54,88 @@ export class GenerateBookingComponent {
     this.booking = this.bookingDataService.getBookingData();
     this.bookingMsg = this.bookingDataService.getBookingMsg();
 
-    // 🔹 Recuperar tamaños disponibles del servicio
     this.availableSizes = this.bookingDataService.getAvailableSizes();
-    // Limpieza de datos antiguos
     this.bookingDataService.clear();
   }
 
-  // Seleccionar tamaño
-  selectSize(size: string) {
-    this.selectedSize = size;
+  // -------------------- FECHA --------------------
+  onDateChange(expirationDate: string) {
+    if (!expirationDate) {
+      this.selectedDays = null;
+      this.totalPrice = null;
+      return;
+    }
+
+    const [yearStr, monthStr, dayStr] = expirationDate.split('-');
+    const year = Number(yearStr);
+    const month = Number(monthStr);
+    const day = Number(dayStr);
+
+    if (Number.isNaN(year) || Number.isNaN(month) || Number.isNaN(day)) {
+      this.selectedDays = null;
+      this.totalPrice = null;
+      return;
+    }
+
+    const expirationDateLocal = new Date(year, month - 1, day);
+    const todayLocal = new Date();
+    todayLocal.setHours(0,0,0,0);
+
+    const msPerDay = 1000 * 60 * 60 * 24;
+    const diffMs = expirationDateLocal.getTime() - todayLocal.getTime();
+    const diffDays = Math.floor(diffMs / msPerDay);
+
+    this.selectedDays = diffDays < 0 ? 1 : diffDays + 1;
+
+    // Recalcular precio si ya hay tamaño seleccionado
+    if (this.selectedSize) {
+      this.calculatePrice();
+    } else {
+      this.totalPrice = null;
+    }
   }
 
-  // Envío del formulario
+  // -------------------- TAMAÑO --------------------
+  selectSize(size: string) {
+    this.selectedSize = size;
+    if (this.selectedDays !== null) {
+      this.calculatePrice();
+    } else {
+      this.totalPrice = null;
+    }
+  }
+
+  // -------------------- CALCULO PRECIO --------------------
+  calculatePrice() {
+    if (!this.selectedSize || this.selectedDays === null) {
+      this.totalPrice = null;
+      return;
+    }
+
+    let dailyPrice = this.PRICE_PER_DAY;
+
+    if (this.selectedSize === 'XL') {
+      dailyPrice += environment.plusPrice;
+    }
+
+    this.totalPrice = dailyPrice * this.selectedDays;
+  }
+
+  // -------------------- CALCULO FECHA FIN --------------------
+  calculateEndDate(expirationDate: string): string {
+    const expirationMoment = moment(expirationDate, 'YYYY-MM-DD');
+    const today = moment().startOf('day');
+
+    if (expirationMoment.isSame(today, 'day')) {
+      return expirationMoment.add(1, 'day').startOf('day').format('YYYY-MM-DDTHH:mm:ss');
+    } else {
+      return expirationMoment.startOf('day').format('YYYY-MM-DDTHH:mm:ss');
+    }
+  }
+
+  // -------------------- ENVÍO FORMULARIO --------------------
   onSubmit(form: NgForm) {
-    if (form.valid && this.selectedSize) {
+    if (form.valid && this.selectedSize && this.selectedDays !== null) {
       this.isLoading = true;
 
       const bookData = {
@@ -64,13 +145,14 @@ export class GenerateBookingComponent {
         endDate: this.calculateEndDate(form.value.expiration),
         paymentConfirm: false,
         totalPrice: this.totalPrice,
-        size: this.selectedSize  // 🔹 añadimos el tamaño
+        size: this.selectedSize
       };
 
       this.redirectToCheckout(bookData);
     }
   }
 
+  // -------------------- STRIPE --------------------
   async redirectToCheckout(bookData: any) {
     try {
       const session = await this.paymentService.createCheckoutSession(bookData.totalPrice).toPromise();
@@ -85,54 +167,6 @@ export class GenerateBookingComponent {
       console.error('Error creando la sesión:', err);
     } finally {
       this.isLoading = false;
-    }
-  }
-
-  calculatePrice() {
-    const input = (<HTMLInputElement>document.getElementById('expiration')).value;
-    if (!input) {
-      this.totalPrice = this.PRICE_PER_DAY;
-      return;
-    }
-
-    const [yearStr, monthStr, dayStr] = input.split('-');
-    const year = Number(yearStr);
-    const month = Number(monthStr);
-    const day = Number(dayStr);
-
-    if (Number.isNaN(year) || Number.isNaN(month) || Number.isNaN(day)) {
-      this.totalPrice = this.PRICE_PER_DAY;
-      return;
-    }
-
-    const expirationDateLocal = new Date(year, month - 1, day);
-    const now = new Date();
-    const todayLocal = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-
-    const msPerDay = 1000 * 60 * 60 * 24;
-    const diffMs = expirationDateLocal.getTime() - todayLocal.getTime();
-    const diffDays = Math.floor(diffMs / msPerDay);
-
-    const daysToCharge = diffDays < 0 ? 1 : diffDays + 1;
-    // 🔹 Precio base
-    let dailyPrice = this.PRICE_PER_DAY;
-
-    // 🔹 Recargo de 2€/día si la taquilla es XL
-    if (this.selectedSize === 'XL') {
-      dailyPrice += environment.plusPrice;
-    }
-
-    this.totalPrice = daysToCharge * dailyPrice;
-  }
-
-  calculateEndDate(expirationDate: string): string {
-    const expirationMoment = moment(expirationDate, 'YYYY-MM-DD');
-    const today = moment().startOf('day');
-
-    if (expirationMoment.isSame(today, 'day')) {
-      return expirationMoment.add(1, 'day').startOf('day').format('YYYY-MM-DDTHH:mm:ss');
-    } else {
-      return expirationMoment.startOf('day').format('YYYY-MM-DDTHH:mm:ss');
     }
   }
 }

@@ -1,7 +1,9 @@
 <!-- Encabezado del formulario -->
 <h2 class="header-title">ANDALUSIAN ROOMS LOCKER</h2>
 
-<div *ngIf="bookingMsg" id="bookingMsg">
+<!-- Mensaje de confirmación -->
+<div *ngIf="bookingMsg" id="bookingMsg" class="booking-success" @fadeIn>
+  <span class="tick">✔</span>
   <p>{{ bookingMsg }}</p>
 </div>
 
@@ -42,44 +44,47 @@
       </div>
     </div>
   </div>
+
+  <!-- Selección de tamaño -->
   <div>
     <label>Tamaño de taquilla</label>
     <div class="locker-sizes">
-    <!-- Opción XL -->
-    <button type="button"
-            [disabled]="!availableSizes.includes('XL')"
-            [class.selected]="selectedSize === 'XL'"
-            (click)="selectedSize = 'XL'"
-            class="large-icon">
-      <span class="icon">🧳</span>
-      <span class="letter">XL</span>
-    </button>
-    
-    <!-- Opción L -->
-    <button type="button"
-            [disabled]="!availableSizes.includes('L')"
-            [class.selected]="selectedSize === 'L'"
-            (click)="selectedSize = 'L'">
-      <span class="icon">🧳</span>
-      <span class="letter">L</span>
-    </button>
-  </div>
-  <div *ngIf="!selectedSize && form.submitted" class="error">
+      <!-- Opción XL -->
+      <button type="button"
+              [disabled]="!availableSizes.includes('XL')"
+              [class.selected]="selectedSize === 'XL'"
+              (click)="selectSize('XL')"
+              class="large-icon">
+        <span class="icon">🧳</span>
+        <span class="letter">XL</span>
+      </button>
+      
+      <!-- Opción L -->
+      <button type="button"
+              [disabled]="!availableSizes.includes('L')"
+              [class.selected]="selectedSize === 'L'"
+              (click)="selectSize('L')">
+        <span class="icon">🧳</span>
+        <span class="letter">L</span>
+      </button>
+    </div>
+    <div *ngIf="!selectedSize && form.submitted" class="error">
       Debes seleccionar un tamaño de taquilla.
     </div>
   </div>
+
   <!-- Campo de fecha límite -->
   <div>
-  <label for="expiration">Fecha recogida equipaje</label>
+    <label for="expiration">Fecha recogida equipaje</label>
     <input type="date" 
-          id="expiration" 
-          name="expiration" 
-          ngModel 
-          required 
-          #expiration="ngModel" 
-          [min]="minDate" 
-          (change)="calculatePrice()"
-          [disabled]="!selectedSize"> <!-- 🔹 Bloqueado hasta elegir taquilla -->
+           id="expiration" 
+           name="expiration" 
+           ngModel 
+           required 
+           #expiration="ngModel" 
+           [min]="minDate" 
+           (change)="onDateChange($any($event.target).value)"
+           [disabled]="!selectedSize">
     <div *ngIf="expiration.invalid && expiration.touched" class="error">
       La fecha es obligatoria.
     </div>
@@ -94,7 +99,7 @@
     </select>
   </div>
 
-  <!-- Muestra el precio calculado -->
+  <!-- Muestra el precio calculado solo si totalPrice es válido -->
   <div *ngIf="totalPrice !== null">
     <label for="price">Precio</label>
     <p id="price">€ {{ totalPrice }}</p>
@@ -102,10 +107,10 @@
 
   <!-- Botón de Enviar -->
   <button class="enviar" type="submit" 
-        [disabled]="form.invalid || isLoading || !selectedSize">
-        <ng-container *ngIf="!isLoading">Reservar</ng-container>
-        <ng-container *ngIf="isLoading">
-          <span class="spinner"></span> Procesando...
-        </ng-container>
+          [disabled]="form.invalid || isLoading || !selectedSize || totalPrice === null">
+    <ng-container *ngIf="!isLoading">Reservar</ng-container>
+    <ng-container *ngIf="isLoading">
+      <span class="spinner"></span> Procesando...
+    </ng-container>
   </button>
 </form>

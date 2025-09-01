@@ -9,6 +9,8 @@ import { HomePageComponent } from './home-page/home-page.component';
 import { ManageBookingComponent } from './manage-booking/manage-booking.component';
 import { PaymentComponent } from './payment/payment.component';
 import { SuccessComponent } from './success/success.component';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 const appRoutes: Routes = [
   // Aquí defines tus rutas
   { path: '', component: HomePageComponent },
@@ -30,6 +32,7 @@ const appRoutes: Routes = [
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     FormsModule,
     RouterModule.forRoot(appRoutes),
     HttpClientModule
