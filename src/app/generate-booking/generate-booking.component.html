@@ -1,12 +1,6 @@
 <!-- Encabezado del formulario -->
 <h2 class="header-title">ANDALUSIAN ROOMS LOCKER</h2>
 
-<!-- Mensaje de confirmación -->
-<div *ngIf="bookingMsg" id="bookingMsg" class="booking-success" @fadeIn>
-  <span class="tick">✔</span>
-  <p>{{ bookingMsg }}</p>
-</div>
-
 <form #form="ngForm" (ngSubmit)="onSubmit(form)">
   <!-- Campo de nombre -->
   <div>
@@ -14,20 +8,6 @@
     <input type="text" id="name" name="name" ngModel required placeholder="Ingresa tu nombre">
     <div *ngIf="form.controls['name']?.invalid && form.controls['name']?.touched" class="error">
       El nombre es obligatorio.
-    </div>
-  </div>
-
-  <!-- Campo de teléfono -->
-  <div>
-    <label for="phone">Teléfono</label>
-    <input type="tel" id="phone" name="phone" pattern="^[0-9]{9}$" ngModel required #phone="ngModel" placeholder="Ingresa tu teléfono">
-    <div *ngIf="phone.invalid && phone.touched" class="error">
-      <div *ngIf="phone.errors?.['required']">
-        El teléfono es obligatorio.
-      </div>
-      <div *ngIf="phone.errors?.['pattern']">
-        El teléfono debe tener exactamente 9 dígitos numéricos.
-      </div>
     </div>
   </div>
 

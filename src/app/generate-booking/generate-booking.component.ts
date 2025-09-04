@@ -33,7 +33,6 @@ export class GenerateBookingComponent {
   PRICE_PER_DAY = environment.price;
 
   booking: any;  
-  bookingMsg: string | undefined;
   isLoading = false;
 
   // Tamaños de taquilla
@@ -52,7 +51,6 @@ export class GenerateBookingComponent {
     this.minDate = today.toISOString().split('T')[0];  
 
     this.booking = this.bookingDataService.getBookingData();
-    this.bookingMsg = this.bookingDataService.getBookingMsg();
 
     this.availableSizes = this.bookingDataService.getAvailableSizes();
     this.bookingDataService.clear();
@@ -140,7 +138,6 @@ export class GenerateBookingComponent {
 
       const bookData = {
         name: form.value.name,
-        phone: form.value.phone,
         email: form.value.email,
         endDate: this.calculateEndDate(form.value.expiration),
         paymentConfirm: false,

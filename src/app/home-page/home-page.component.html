@@ -1,4 +1,9 @@
 <div class="home-page">
+        <!-- Mensaje de confirmación -->
+    <div *ngIf="bookingMsg" id="bookingMsg" class="booking-success" @fadeIn>
+    <span class="tick">✔</span>
+    <p>{{ bookingMsg }}</p>
+    </div>
     <div class="container-options">
         <h2>ANDALUSIAN ROOMS LOCKER</h2>
         <button (click)="route('generateBooking')">Guardar Equipaje</button>

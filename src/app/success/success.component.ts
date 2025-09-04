@@ -84,7 +84,7 @@ export class SuccessComponent implements OnInit {
           this.bookingMsg = `Reserva completada, gracias. Revise su correo.`;
 
           this.bookingDataService.setBookingData(this.booking, this.bookingMsg);
-          this.router.navigate(['/generateBooking']);
+          this.router.navigate(['/']);
         } else if (response.status === 204) {
           this.bookingMsg = "Lo sentimos, todas nuestras taquillas están ocupadas, se le devolverá el importe en los siguientes días";
         }

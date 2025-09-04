@@ -1,5 +1,4 @@
 .home-page {
-  display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh; /* Evita problemas en móvil con height */
@@ -16,7 +15,6 @@
   box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
   padding: clamp(1rem, 5vw, 40px);
   max-width: 500px;
-  width: 100%;
   margin: clamp(1rem, 4vh, 2rem) auto;
   background-image: url('/assets/images/rooms-designs.jpg');
   background-size: cover;        /* La imagen cubre todo el contenedor */
@@ -44,6 +42,38 @@ button {
   transition: all 0.3s ease;
   width: clamp(180px, 60%, 250px);
   font-family: "Playfair Display", serif;
+}
+
+/* Contenedor del mensaje */
+#bookingMsg {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #e6f9ed;
+  border: 1px solid #34c759;
+  color: #2d7a42;
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+  opacity: 0;
+  transform: translateY(-10px);
+  animation: fadeInMsg 0.4s ease-out forwards;
+  justify-content: center;
+}
+
+/* Tick verde */
+#bookingMsg .tick {
+  color: #34c759;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+/* Animación de aparición */
+@keyframes fadeInMsg {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 /* Mensaje de servicio no disponible */
