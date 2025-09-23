@@ -1,169 +1,63 @@
-import { Component } from '@angular/core';
-import { BookService } from '../services/book.service';
-import { NgForm } from '@angular/forms';
-import * as moment from 'moment';
-import { loadStripe } from '@stripe/stripe-js';
-import { PaymentService } from '../services/payment.service';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { BoxData } from '../models/box-data.model';
 import { BookingDataService } from '../services/booking-data.service';
-import { environment } from 'src/environments/environment';
-import { animate, style, transition, trigger } from '@angular/animations';
+import { BookService } from '../services/book.service';
 
 @Component({
   selector: 'app-generate-booking',
   templateUrl: './generate-booking.component.html',
-  styleUrls: ['./generate-booking.component.css'],
-  animations: [
-    trigger('fadeIn', [
-      transition(':enter', [
-        style({ opacity: 0, transform: 'translateY(-10px)' }),
-        animate('1000ms ease-out', style({ opacity: 1, transform: 'translateY(0)' }))
-      ]),
-      transition(':leave', [
-        animate('800ms ease-in', style({ opacity: 0, transform: 'translateY(-10px)' }))
-      ])
-    ])
-  ]
+  styleUrls: ['./generate-booking.component.css']
 })
-export class GenerateBookingComponent {
-  minDate: string = '';
-  totalPrice: number | null = null;
-  selectedDays: number | null = null;
-
-  PRICE_PER_DAY = environment.price;
-
-  booking: any;  
-  isLoading = false;
-
-  // Tamaños de taquilla
-  availableSizes: string[] = [];
-  selectedSize: string | null = null;
+export class GenerateBookingComponent implements OnInit {
+  box!: BoxData; // taquilla seleccionada
+  days: number = 1;
+  contactMethod: 'email' | 'sms' | null = null;
+  email: string = '';
+  phone: string = '';
 
   constructor(
-    private bookService: BookService,
+    private router: Router,
     private bookingDataService: BookingDataService,
-    private paymentService: PaymentService,
-    private router: Router
+    private bookService: BookService
   ) {}
 
-  ngOnInit() {
-    const today = new Date();
-    this.minDate = today.toISOString().split('T')[0];  
-
-    this.booking = this.bookingDataService.getBookingData();
-
-    this.availableSizes = this.bookingDataService.getAvailableSizes();
-    this.bookingDataService.clear();
+  ngOnInit(): void {
+    this.box = this.bookingDataService.getSelectedBox()!;
   }
 
-  // -------------------- FECHA --------------------
-  onDateChange(expirationDate: string) {
-    if (!expirationDate) {
-      this.selectedDays = null;
-      this.totalPrice = null;
+  incrementDays() { this.days++; }
+  decrementDays() { if (this.days > 1) this.days--; }
+
+  finalizeBooking() {
+    if (!this.contactMethod) {
+      alert('Selecciona SMS o Email como método de notificación.');
       return;
     }
 
-    const [yearStr, monthStr, dayStr] = expirationDate.split('-');
-    const year = Number(yearStr);
-    const month = Number(monthStr);
-    const day = Number(dayStr);
+    // Construir objeto BookingRequest
+    const bookingRequest = {
+      boxId: this.box.boxId,
+      email: this.contactMethod === 'email' ? this.email : null,
+      phone: this.contactMethod === 'sms' ? this.phone : null,
+      notification: this.contactMethod === 'email' ? 'EMAIL' : 'SMS',
+      days: this.days
+    };
 
-    if (Number.isNaN(year) || Number.isNaN(month) || Number.isNaN(day)) {
-      this.selectedDays = null;
-      this.totalPrice = null;
-      return;
-    }
-
-    const expirationDateLocal = new Date(year, month - 1, day);
-    const todayLocal = new Date();
-    todayLocal.setHours(0,0,0,0);
-
-    const msPerDay = 1000 * 60 * 60 * 24;
-    const diffMs = expirationDateLocal.getTime() - todayLocal.getTime();
-    const diffDays = Math.floor(diffMs / msPerDay);
-
-    this.selectedDays = diffDays < 0 ? 1 : diffDays + 1;
-
-    // Recalcular precio si ya hay tamaño seleccionado
-    if (this.selectedSize) {
-      this.calculatePrice();
-    } else {
-      this.totalPrice = null;
-    }
-  }
-
-  // -------------------- TAMAÑO --------------------
-  selectSize(size: string) {
-    this.selectedSize = size;
-    if (this.selectedDays !== null) {
-      this.calculatePrice();
-    } else {
-      this.totalPrice = null;
-    }
-  }
-
-  // -------------------- CALCULO PRECIO --------------------
-  calculatePrice() {
-    if (!this.selectedSize || this.selectedDays === null) {
-      this.totalPrice = null;
-      return;
-    }
-
-    let dailyPrice = this.PRICE_PER_DAY;
-
-    if (this.selectedSize === 'XL') {
-      dailyPrice += environment.plusPrice;
-    }
-
-    this.totalPrice = dailyPrice * this.selectedDays;
-  }
-
-  // -------------------- CALCULO FECHA FIN --------------------
-  calculateEndDate(expirationDate: string): string {
-    const expirationMoment = moment(expirationDate, 'YYYY-MM-DD');
-    const today = moment().startOf('day');
-
-    if (expirationMoment.isSame(today, 'day')) {
-      return expirationMoment.add(1, 'day').startOf('day').format('YYYY-MM-DDTHH:mm:ss');
-    } else {
-      return expirationMoment.startOf('day').format('YYYY-MM-DDTHH:mm:ss');
-    }
-  }
-
-  // -------------------- ENVÍO FORMULARIO --------------------
-  onSubmit(form: NgForm) {
-    if (form.valid && this.selectedSize && this.selectedDays !== null) {
-      this.isLoading = true;
-
-      const bookData = {
-        name: form.value.name,
-        email: form.value.email,
-        endDate: this.calculateEndDate(form.value.expiration),
-        paymentConfirm: false,
-        totalPrice: this.totalPrice,
-        size: this.selectedSize
-      };
-
-      this.redirectToCheckout(bookData);
-    }
-  }
-
-  // -------------------- STRIPE --------------------
-  async redirectToCheckout(bookData: any) {
-    try {
-      const session = await this.paymentService.createCheckoutSession(bookData.totalPrice).toPromise();
-      const stripe = await loadStripe(environment.stripePublicKey);
-
-      if (stripe && session?.id) {
-        sessionStorage.setItem('bookData', JSON.stringify(bookData));
-        const { error } = await stripe.redirectToCheckout({ sessionId: session.id });
-        if (error) console.error('Stripe redirection error:', error.message);
+    // ✅ Usar el servicio para enviar la reserva
+    this.bookService.sendBook(bookingRequest).subscribe({
+      next: (response) => {
+        if (response.status === 200 || response.status === 201) {
+          alert('Reserva finalizada con éxito');
+          this.router.navigate(['/']);
+        } else {
+          alert('No se pudo completar la reserva. Inténtalo de nuevo.');
+        }
+      },
+      error: (err) => {
+        console.error('Error al enviar reserva', err);
+        alert('Error al enviar la reserva');
       }
-    } catch (err) {
-      console.error('Error creando la sesión:', err);
-    } finally {
-      this.isLoading = false;
-    }
+    });
   }
 }

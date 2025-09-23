@@ -1,0 +1,82 @@
+/* Contenedor centrado */
+.box-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 100px); /* 8 columnas fijas */
+  grid-auto-rows: 100px;                  /* filas automáticas de 100px */
+  gap: 30px;                               /* espacio entre cajas */
+  justify-content: center;                 /* centra horizontalmente la cuadrícula */
+  padding: 16px;
+}
+
+/* Cada box */
+.box-tile {
+  position: relative;                      
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #007bff; /* azul por defecto */
+  color: white;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.2s;
+  overflow: hidden;
+}
+
+/* Hover */
+.box-tile:hover {
+  transform: scale(1.05);
+}
+
+/* Tamaño L opcional */
+.size-l {
+  background-color: #4d8bce;
+}
+
+/* Tamaño M opcional */
+.size-m {
+  background-color: #4d8bce;
+}
+
+/* No disponible: gris uniforme y más claro */
+.unavailable {
+  background-color: #c0c2c4; /* gris claro */
+  cursor: not-allowed;
+}
+
+/* Box ID centrado */
+.box-tile span.box-id {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 1.2rem;
+}
+
+/* Tamaño de la taquilla en la parte inferior */
+.box-tile div.box-size {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+  padding: 4px 0;
+  font-weight: bold;
+  color: white;
+  background-color: rgba(0, 0, 0, 0.3); /* fondo semi-transparente */
+
+  /* Para los que no están disponibles, usar mismo gris que el cuadrado */
+}
+
+.unavailable .box-size {
+  background-color: #c0c2c4; /* mismo gris que el cuadrado */
+  color: white;
+}
+
+/* Diferenciar color por tamaño para disponibles */
+.size-m .box-size {
+  background-color: rgba(77, 139, 206, 0.6);
+}
+
+.size-l .box-size {
+  background-color: rgba(77, 139, 206, 0.8);
+}

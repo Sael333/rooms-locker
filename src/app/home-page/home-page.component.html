@@ -1,15 +1,10 @@
-<div class="home-page">
-        <!-- Mensaje de confirmación -->
-    <div *ngIf="bookingMsg" id="bookingMsg" class="booking-success" @fadeIn>
-    <span class="tick">✔</span>
-    <p>{{ bookingMsg }}</p>
-    </div>
-    <div class="container-options">
-        <h2>ANDALUSIAN ROOMS LOCKER</h2>
-        <button (click)="route('generateBooking')">Guardar Equipaje</button>
-        <button (click)="route('pickupLuggage')">Recoger Equipaje</button>
-        <div *ngIf="unavailableServiceMsg" id="unavailableServiceMsg">
-            <p>{{ unavailableServiceMsg }}</p>
-        </div>
-    </div>
+<div class="home-page d-flex justify-content-center align-items-center vh-100">
+  <div class="d-flex justify-content-center align-items-center gap-5">
+    <button class="btn btn-primary option-btn me-5" (click)="route('boxOffice')">
+      RESERVAR
+    </button>
+    <button class="btn btn-primary option-btn ms-5" (click)="route('pickupLuggage')">
+      RECOGER
+    </button>
+  </div>
 </div>

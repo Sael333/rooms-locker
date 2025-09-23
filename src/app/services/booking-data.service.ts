@@ -1,5 +1,6 @@
 // booking-data.service.ts
 import { Injectable } from '@angular/core';
+import { BoxData } from '../models/box-data.model';
 
 @Injectable({
   providedIn: 'root'
@@ -7,7 +8,8 @@ import { Injectable } from '@angular/core';
 export class BookingDataService {
   private bookingData: any = null;
   private bookingMsg: string | undefined;
-  private availableSizes: string[] = [];
+  private boxData: any = [];
+  private selectedBox: BoxData | null = null;
 
   setBookingData(data: any, msg?: string) {
     this.bookingData = data;
@@ -28,15 +30,23 @@ export class BookingDataService {
   }
   
    // 🔹 NUEVOS métodos para tamaños
-  setAvailableSizes(sizes: string[]) {
-    this.availableSizes = sizes;
+  setAvailableSizes(boxData: any) {
+    this.boxData = boxData;
   }
 
-  getAvailableSizes() {
-    return this.availableSizes;
+  getBoxData() {
+    return this.boxData;
   }
 
   setBookingMsg(msg?: string) {
     this.bookingMsg = msg;
+  }
+
+  setSelectedBox(box: BoxData) {
+    this.selectedBox = box;
+  }
+
+  getSelectedBox(): BoxData | null {
+    return this.selectedBox;
   }
 }

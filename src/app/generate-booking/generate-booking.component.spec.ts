@@ -1,16 +1,16 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { HomeUserComponent } from './generate-booking.component';
+import { GenerateBookingComponent } from './generate-booking.component';
 
-describe('HomeUserComponent', () => {
-  let component: HomeUserComponent;
-  let fixture: ComponentFixture<HomeUserComponent>;
+describe('GenerateBookingComponent', () => {
+  let component: GenerateBookingComponent;
+  let fixture: ComponentFixture<GenerateBookingComponent>;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      declarations: [HomeUserComponent]
+      declarations: [GenerateBookingComponent]
     });
-    fixture = TestBed.createComponent(HomeUserComponent);
+    fixture = TestBed.createComponent(GenerateBookingComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

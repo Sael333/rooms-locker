@@ -1,96 +1,59 @@
-<!-- Encabezado del formulario -->
-<h2 class="header-title">ANDALUSIAN ROOMS LOCKER</h2>
+<div class="container vh-100 d-flex justify-content-center align-items-center">
+  <div class="card p-5 shadow-sm d-flex flex-column justify-content-between booking-card">
+    <!-- Parte superior: título y controles -->
+    <div>
+      <h2 class="text-center text-primary mb-5 fs-1">Reservar taquilla {{ box?.boxId }}</h2>
 
-<form #form="ngForm" (ngSubmit)="onSubmit(form)">
-  <!-- Campo de nombre -->
-  <div>
-    <label for="name">Nombre</label>
-    <input type="text" id="name" name="name" ngModel required placeholder="Ingresa tu nombre">
-    <div *ngIf="form.controls['name']?.invalid && form.controls['name']?.touched" class="error">
-      El nombre es obligatorio.
-    </div>
-  </div>
-
-  <!-- Campo de email -->
-  <div>
-    <label for="email">Email</label>
-    <input type="email" id="email" name="email" ngModel required email #email="ngModel" placeholder="Ingresa tu email">
-    <div *ngIf="email.invalid && email.touched" class="error">
-      <div *ngIf="email.errors?.['required']">
-        El email es obligatorio.
+      <!-- Label Nº DÍAS -->
+      <div class="text-center mb-4">
+        <span class="fw-bold text-secondary fs-3">Nº DÍAS</span>
       </div>
-      <div *ngIf="email.errors?.['email']">
-        El email debe ser válido.
+
+      <!-- Selector de días -->
+      <div class="d-flex justify-content-center align-items-center mb-5">
+        <button class="btn btn-primary btn-lg me-5 day-btn" (click)="decrementDays()">
+            <i class="bi bi-dash"></i>
+        </button>
+
+        <span class="fs-1 fw-bold mx-4">{{ days }}</span>
+
+        <button class="btn btn-primary btn-lg ms-5 day-btn" (click)="incrementDays()">
+            <i class="bi bi-plus"></i>
+        </button>
       </div>
+
+      <!-- Método de contacto -->
+      <div class="mb-4 text-center fs-4">
+        <div class="form-check form-check-inline mb-3 me-5">
+          <input class="form-check-input" type="radio" name="contact" id="emailOption"
+                 (change)="contactMethod='email'" [checked]="contactMethod==='email'">
+          <label class="form-check-label" for="emailOption">Email</label>
+        </div>
+        <div class="form-check form-check-inline mb-3 ms-5">
+          <input class="form-check-input" type="radio" name="contact" id="smsOption"
+                 (change)="contactMethod='sms'" [checked]="contactMethod==='sms'">
+          <label class="form-check-label" for="smsOption">SMS</label>
+        </div>
+      </div>
+
+      <!-- Campos condicionales -->
+      <div *ngIf="contactMethod==='email'" class="mb-3">
+        <input type="email" class="form-control form-control-lg input-big" 
+                placeholder="Introduce tu email"
+                [(ngModel)]="email">
+      </div>
+
+<!-- Teléfono -->
+       <div *ngIf="contactMethod==='sms'" class="mb-3">
+         <input type="text" class="form-control form-control-lg input-big" 
+            placeholder="Introduce tu número de teléfono"
+            [(ngModel)]="phone">
+        </div>
+    </div>
+
+    <!-- Botón Finalizar fijo abajo -->
+    <div class="mt-auto">
+      <button class="btn btn-primary btn-lg w-100 finalize-btn" (click)="finalizeBooking()">Finalizar</button>
     </div>
   </div>
-
-  <!-- Selección de tamaño -->
-  <div>
-    <label>Tamaño de taquilla</label>
-    <div class="locker-sizes">
-      <!-- Opción XL -->
-      <button type="button"
-              [disabled]="!availableSizes.includes('XL')"
-              [class.selected]="selectedSize === 'XL'"
-              (click)="selectSize('XL')"
-              class="large-icon">
-        <span class="icon">🧳</span>
-        <span class="letter">XL</span>
-      </button>
-      
-      <!-- Opción L -->
-      <button type="button"
-              [disabled]="!availableSizes.includes('L')"
-              [class.selected]="selectedSize === 'L'"
-              (click)="selectSize('L')">
-        <span class="icon">🧳</span>
-        <span class="letter">L</span>
-      </button>
-    </div>
-    <div *ngIf="!selectedSize && form.submitted" class="error">
-      Debes seleccionar un tamaño de taquilla.
-    </div>
-  </div>
-
-  <!-- Campo de fecha límite -->
-  <div>
-    <label for="expiration">Fecha recogida equipaje</label>
-    <input type="date" 
-           id="expiration" 
-           name="expiration" 
-           ngModel 
-           required 
-           #expiration="ngModel" 
-           [min]="minDate" 
-           (change)="onDateChange($any($event.target).value)"
-           [disabled]="!selectedSize">
-    <div *ngIf="expiration.invalid && expiration.touched" class="error">
-      La fecha es obligatoria.
-    </div>
-  </div>
-
-  <!-- Selector de método de pago -->
-  <div>
-    <label for="paymentMethod">Método de pago</label>
-    <select id="paymentMethod" name="paymentMethod" ngModel required>
-      <option value="">Seleccione un método de pago</option>
-      <option value="creditCard">Pago con tarjeta de crédito</option>
-    </select>
-  </div>
-
-  <!-- Muestra el precio calculado solo si totalPrice es válido -->
-  <div *ngIf="totalPrice !== null">
-    <label for="price">Precio</label>
-    <p id="price">€ {{ totalPrice }}</p>
-  </div>
-
-  <!-- Botón de Enviar -->
-  <button class="enviar" type="submit" 
-          [disabled]="form.invalid || isLoading || !selectedSize || totalPrice === null">
-    <ng-container *ngIf="!isLoading">Reservar</ng-container>
-    <ng-container *ngIf="isLoading">
-      <span class="spinner"></span> Procesando...
-    </ng-container>
-  </button>
-</form>
+</div>

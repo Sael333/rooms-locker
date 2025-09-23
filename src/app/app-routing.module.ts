@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { PaymentComponent } from './payment/payment.component';
-import { SuccessComponent } from './success/success.component';
+import { BoxOfficesComponent } from './box-offices/box-offices.component';
+import { GenerateBookingComponent } from './generate-booking/generate-booking.component';
 
 const routes: Routes = [
-  { path: 'payment', component: PaymentComponent },
-  { path: 'success', component: SuccessComponent },
+  { path: 'boxOffice', component: BoxOfficesComponent },
+  { path: 'generateBooking', component: GenerateBookingComponent },
 ];
 
 @NgModule({

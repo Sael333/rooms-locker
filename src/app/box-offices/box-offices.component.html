@@ -1,0 +1,20 @@
+<div class="container-fluid d-flex justify-content-center align-items-center vh-100">
+  <div class="box-grid">
+    <div
+      *ngFor="let box of boxes"
+      class="box-tile"
+      [ngClass]="{
+        'size-m': box.size === 'M' && box.available,
+        'size-l': box.size === 'L' && box.available,
+        'unavailable': !box.available
+      }"
+      (click)="box.available && onBoxClick(box)"
+    >
+      <!-- Box ID centrado -->
+      <span class="box-id">{{ box.boxId }}</span>
+
+      <!-- Tamaño solo si está disponible -->
+      <div class="box-size" *ngIf="box.available">{{ box.size }}</div>
+    </div>
+  </div>
+</div>
