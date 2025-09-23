@@ -6,6 +6,7 @@ import { BookingDataService } from '../services/booking-data.service';
 @Component({
   selector: 'app-home-page',
   templateUrl: './home-page.component.html',
+    standalone: true,
   styleUrls: ['./home-page.component.css']
 
 })

@@ -3,11 +3,14 @@ import { BookService } from '../services/book.service';
 import { BoxData } from '../models/box-data.model';
 import { Route, Router } from '@angular/router';
 import { BookingDataService } from '../services/booking-data.service';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-box-offices',
   templateUrl: './box-offices.component.html',
-  styleUrls: ['./box-offices.component.css']
+    standalone: true,
+  styleUrls: ['./box-offices.component.css'],
+   imports: [CommonModule] // <-- agrega CommonModule aquí
 })
 export class BoxOfficesComponent implements OnInit {
 

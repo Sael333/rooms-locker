@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { BoxData } from '../models/box-data.model';
 import { BookingDataService } from '../services/booking-data.service';
 import { BookService } from '../services/book.service';
@@ -7,14 +9,16 @@ import { BookService } from '../services/book.service';
 @Component({
   selector: 'app-generate-booking',
   templateUrl: './generate-booking.component.html',
-  styleUrls: ['./generate-booking.component.css']
+  styleUrls: ['./generate-booking.component.css'],
+  standalone: true,
+  imports: [CommonModule, FormsModule] // <-- necesarias para *ngIf, *ngFor y ngModel
 })
 export class GenerateBookingComponent implements OnInit {
   box!: BoxData; // taquilla seleccionada
-  days: number = 1;
+  days = 1;
   contactMethod: 'email' | 'sms' | null = null;
-  email: string = '';
-  phone: string = '';
+  email = '';
+  phone = '';
 
   constructor(
     private router: Router,
@@ -35,16 +39,14 @@ export class GenerateBookingComponent implements OnInit {
       return;
     }
 
-    // Construir objeto BookingRequest
     const bookingRequest = {
-      boxId: this.box.boxId,
+      boxId: this.box.boxId, // <-- ya no necesitas `?.`
       email: this.contactMethod === 'email' ? this.email : null,
       phone: this.contactMethod === 'sms' ? this.phone : null,
       notification: this.contactMethod === 'email' ? 'EMAIL' : 'SMS',
       days: this.days
     };
 
-    // ✅ Usar el servicio para enviar la reserva
     this.bookService.sendBook(bookingRequest).subscribe({
       next: (response) => {
         if (response.status === 200 || response.status === 201) {
